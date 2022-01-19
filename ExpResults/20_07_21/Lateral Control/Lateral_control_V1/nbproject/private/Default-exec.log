@@ -1,0 +1,7 @@
+called: /usr/bin/g++
+	/home/ubuntu/Bench_control_V1
+	/usr/bin/g++
+	-c
+	main.cpp
+	-std=gnu++11
+

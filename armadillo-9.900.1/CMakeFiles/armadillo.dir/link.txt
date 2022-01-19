@@ -1,0 +1,1 @@
+/usr/bin/arm-linux-gnueabihf-g++ -fPIC  -std=c++11 -O2  -Wl,--no-as-needed -shared -Wl,-soname,libarmadillo.so.9 -o libarmadillo.so.9.900.1 CMakeFiles/armadillo.dir/src/wrapper1.cpp.o CMakeFiles/armadillo.dir/src/wrapper2.cpp.o 

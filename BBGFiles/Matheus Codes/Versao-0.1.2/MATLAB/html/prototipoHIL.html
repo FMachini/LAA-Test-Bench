@@ -1,0 +1,319 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Estrutura simplificada do hil 'atuante'</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-12-09"><meta name="DC.source" content="prototipoHIL.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Estrutura simplificada do hil 'atuante'</h1><!--introduction--><div><ol><li>Setar parametros iniciais</li><li>Receber o estado da planta (da beagle bone)</li><li>Receber sinal de controle (velocidade dos rotores) do controlador</li><li>Repetir processos 2 e 3 por 'numero de iteracoes' de vezes</li><li>Fim</li></ol></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Lista de parametros principais</a></li><li><a href="#2">Limpar dados anterior</a></li><li><a href="#3">Setar parametros iniciais</a></li><li><a href="#4">Configuracao de rede - comunicacao</a></li><li><a href="#5">Muticopter properties</a></li><li><a href="#6">Enviar parametros iniciais para a Beagle Bone</a></li><li><a href="#7">Armazenar dados para analise</a></li><li><a href="#8">Armazenar e calcular dados para analise de tempo de processamento</a></li><li><a href="#9">Inicio da aplicacao de controle a atuacao</a></li><li><a href="#10">Fim de execucao. Analise dos resultados obtidos</a></li></ul></div><h2>Lista de parametros principais<a name="1"></a></h2><div><ul><li>XX: estado da aeronave -- coordenadas, orietacao, velocidades lineares e angulares</li><li>omega: velocidade dos rotores</li></ul></div><h2>Limpar dados anterior<a name="2"></a></h2><pre class="codeinput">clc; clear <span class="string">all</span>;
+</pre><h2>Setar parametros iniciais<a name="3"></a></h2><pre class="codeinput">nIteracoes = 5000; <span class="comment">% numero de iteracoes</span>
+XX = zeros(1, 12); <span class="comment">% estados a serem recebidos pela BBG</span>
+omega = zeros(1,4); <span class="comment">% velocidade dos rotores</span>
+dt = 0.02; <span class="comment">% tempo de amostragem em segundos</span>
+
+<span class="comment">%K1 = load("K1.txt");</span>
+<span class="comment">%Kx = load("Kx.txt");</span>
+
+<span class="comment">%carregando matrizes de ganho (K1 e Kx)</span>
+load <span class="string">matrices.mat</span>;
+
+<span class="comment">%Coeficientes para o polinomio de referencia. Unidades em metros</span>
+CoefRef = [0 0; 0 0; 0 0.1];
+
+<span class="comment">%matriz de trimagem. &lt;&lt;Notacao: M3, M1, M4, M2&gt;&gt;</span>
+trim = [+377.8826; -377.8826; +377.8826; -377.8826];
+
+<span class="comment">%Transformar matrizes num vetor para comunicacao entre bbg e MATLAB</span>
+K1Vet = serialMatriz(K1);
+KxVet = serialMatriz(Kx);
+CoefRefVet = serialMatriz(CoefRef);
+trimVet = serialMatriz(trim);
+</pre><h2>Configuracao de rede - comunicacao<a name="4"></a></h2><pre class="codeinput">IP_BeagleBone = <span class="string">'10.0.33.236'</span>;
+IP_Local = <span class="string">'127.0.0.1'</span>;
+PORT = 8080; <span class="comment">% definda de forma arbritaria</span>
+
+DATA_TYPE = <span class="string">'double'</span>; <span class="comment">% melhorar legibilidade do codigo</span>
+NUMBER_OF_DATA_2_RCV = 4; <span class="comment">% melhorar legibilidade do codigo</span>
+                          <span class="comment">% 4 pq sao as velocidades dos quatro rotores do</span>
+                          <span class="comment">% drone</span>
+
+<span class="comment">%criando socket - Create a TCP/IP Connection</span>
+t_obj = tcpclient(IP_BeagleBone, PORT)
+<span class="comment">%t_obj = tcpclient(IP_Local, PORT)</span>
+</pre><pre class="codeoutput error">Error using prototipoHIL (line 53)
+Cannot create a communication link with the remote server. Please check the input arguments(ADDRESS and PORT) and make sure the server is running.
+Additional Information: Uma tentativa de conex&atilde;o falhou porque o componente conectado n&atilde;o respondeu
+corretamente ap&oacute;s um per&iacute;odo de tempo ou a conex&atilde;o estabelecida falhou
+porque o host conectado n&atilde;o respondeu.
+</pre><h2>Muticopter properties<a name="5"></a></h2><pre class="codeinput">param.n = 4; <span class="comment">% number of eletric motors</span>
+param.m = 0.468; <span class="comment">% Multirrotor mass</span>
+param.J = [0.0049,0,0;
+           0,0.0049,0;
+           0,0,0.0088];<span class="comment">%inertia matrix</span>
+param.kd =4.8e-3; <span class="comment">% drag coefficient</span>
+param.k = 2.9e-5; <span class="comment">%thrust coefficient</span>
+param.l = ones(1,param.n)*0.225; <span class="comment">%multirrotor arm length</span>
+param.gamma = [0,90,180,270]*pi/180; <span class="comment">% multirrotor arm angle wrt x axis</span>
+param.JJm = ones(1,param.n)*3.357e-5; <span class="comment">% propeller moment of inertia</span>
+param.b = 1.1e-6; <span class="comment">%propeller drag coefficient</span>
+param.zcg = ones(1,param.n)*0; <span class="comment">% Center of gravity z position BCS</span>
+param.g = 9.81;
+</pre><h2>Enviar parametros iniciais para a Beagle Bone<a name="6"></a></h2><pre class="codeinput"><span class="comment">%Enviar dados que representam a matriz K1</span>
+write(t_obj, K1Vet);
+<span class="comment">%Enviar dados que representam a matriz Kx</span>
+write(t_obj, KxVet);
+<span class="comment">%Enviar dados que representam a matriz de coeficientes do polinomio de</span>
+<span class="comment">%referencia</span>
+write(t_obj, CoefRefVet);
+<span class="comment">%Enviar o valor do tempo de amostragem</span>
+write(t_obj, dt);
+<span class="comment">%Enviar dados que representam a matriz de trimagem 'trim'</span>
+write(t_obj, trimVet);
+<span class="comment">%Enviar dados que representam a matriz K1</span>
+write(t_obj, nIteracoes);
+</pre><h2>Armazenar dados para analise<a name="7"></a></h2><pre class="codeinput"><span class="comment">%preallocando memoria para variaveis para melhorar eficiencia do codigo</span>
+xx_ = zeros(nIteracoes, 12); <span class="comment">%matriz para armazenar estados passados como um historico</span>
+omega_ = zeros(nIteracoes, 4); <span class="comment">%matriz para armazenar velocidades passadas como um historico</span>
+vetor_tempo_loop = zeros(nIteracoes, 1);
+</pre><h2>Armazenar e calcular dados para analise de tempo de processamento<a name="8"></a></h2><pre class="codeinput"><span class="comment">%Variavel utilizada para obter o tempo gasto por cada iteracao</span>
+tempo_loop = 0;
+
+<span class="comment">%Variavel para medir o tempo que a execucao de todo o loop demorou</span>
+tempo_exec_inicial = tic
+</pre><h2>Inicio da aplicacao de controle a atuacao<a name="9"></a></h2><pre class="codeinput"><span class="keyword">for</span> i = 1:nIteracoes
+    <span class="comment">%Marca o tempo inicial da iteracao i para posteriormente ser calculado</span>
+    <span class="comment">%o tempo gasto ate o final da mesma iteracao</span>
+    tStart = tic;
+
+    <span class="comment">%receber o estado da aeronave da BBG</span>
+    XX = read(t_obj, 12, DATA_TYPE);
+    <span class="comment">%manter historico para plotar posteriormente</span>
+    xx_(i, :) = XX;
+
+    <span class="comment">% Receber dado da BBG (variavel de saida de controle)</span>
+    omega = read(t_obj, NUMBER_OF_DATA_2_RCV, DATA_TYPE);
+    omega_(i, :) = omega;
+
+    <span class="comment">%Registra o tempo que pode ser condiferado como o final da iteracao</span>
+    tempo_loop = toc(tStart);
+
+    <span class="comment">%Variavel utilizada para guardar um historico do tempo gasto por cada</span>
+    <span class="comment">%iteracao</span>
+    vetor_tempo_loop(i, :) = tempo_loop;
+
+    <span class="comment">%Forcar que o loop ocorra a cada 0.02 segundos, mesmo em casos que o</span>
+    <span class="comment">%tempo de calculo e comunicacao com a BBG seja inferior a 0.02.</span>
+    pause(dt - tempo_loop);
+
+<span class="keyword">end</span>
+</pre><h2>Fim de execucao. Analise dos resultados obtidos<a name="10"></a></h2><pre class="codeinput"><span class="comment">%Tempo gasto para executar todas as iteracoes</span>
+tempo_exec = toc(tempo_exec_inicial);
+
+<span class="comment">% limpando recursos utilizados na comunicao</span>
+clear <span class="string">t_obj</span> <span class="comment">%liberando recursos relacionado ao objeto TCP/Ip</span>
+
+<span class="comment">%%somente para debug</span>
+plot(xx_(:,11))
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Estrutura simplificada do hil 'atuante'
+% 
+% # Setar parametros iniciais
+% # Receber o estado da planta (da beagle bone)
+% # Receber sinal de controle (velocidade dos rotores) do controlador
+% # Repetir processos 2 e 3 por 'numero de iteracoes' de vezes
+% # Fim
+%% Lista de parametros principais
+% 
+% * XX: estado da aeronave REPLACE_WITH_DASH_DASH coordenadas, orietacao, velocidades lineares e
+% angulares
+% * omega: velocidade dos rotores
+% 
+
+%% Limpar dados anterior
+clc; clear all;
+
+%% Setar parametros iniciais
+nIteracoes = 5000; % numero de iteracoes
+XX = zeros(1, 12); % estados a serem recebidos pela BBG
+omega = zeros(1,4); % velocidade dos rotores
+dt = 0.02; % tempo de amostragem em segundos
+
+%K1 = load("K1.txt");
+%Kx = load("Kx.txt");
+
+%carregando matrizes de ganho (K1 e Kx)
+load matrices.mat;
+
+%Coeficientes para o polinomio de referencia. Unidades em metros
+CoefRef = [0 0; 0 0; 0 0.1];
+
+%matriz de trimagem. <<Notacao: M3, M1, M4, M2>>
+trim = [+377.8826; -377.8826; +377.8826; -377.8826];
+
+%Transformar matrizes num vetor para comunicacao entre bbg e MATLAB
+K1Vet = serialMatriz(K1);
+KxVet = serialMatriz(Kx);
+CoefRefVet = serialMatriz(CoefRef);
+trimVet = serialMatriz(trim);
+
+%% Configuracao de rede - comunicacao
+IP_BeagleBone = '10.0.33.236';
+IP_Local = '127.0.0.1';
+PORT = 8080; % definda de forma arbritaria
+
+DATA_TYPE = 'double'; % melhorar legibilidade do codigo
+NUMBER_OF_DATA_2_RCV = 4; % melhorar legibilidade do codigo
+                          % 4 pq sao as velocidades dos quatro rotores do
+                          % drone
+                            
+%criando socket - Create a TCP/IP Connection
+t_obj = tcpclient(IP_BeagleBone, PORT)
+%t_obj = tcpclient(IP_Local, PORT)
+
+%% Muticopter properties
+
+param.n = 4; % number of eletric motors
+param.m = 0.468; % Multirrotor mass
+param.J = [0.0049,0,0;
+           0,0.0049,0;
+           0,0,0.0088];%inertia matrix
+param.kd =4.8e-3; % drag coefficient
+param.k = 2.9e-5; %thrust coefficient
+param.l = ones(1,param.n)*0.225; %multirrotor arm length
+param.gamma = [0,90,180,270]*pi/180; % multirrotor arm angle wrt x axis
+param.JJm = ones(1,param.n)*3.357e-5; % propeller moment of inertia
+param.b = 1.1e-6; %propeller drag coefficient
+param.zcg = ones(1,param.n)*0; % Center of gravity z position BCS
+param.g = 9.81;
+
+%% Enviar parametros iniciais para a Beagle Bone
+%Enviar dados que representam a matriz K1
+write(t_obj, K1Vet);
+%Enviar dados que representam a matriz Kx
+write(t_obj, KxVet);
+%Enviar dados que representam a matriz de coeficientes do polinomio de
+%referencia
+write(t_obj, CoefRefVet);
+%Enviar o valor do tempo de amostragem
+write(t_obj, dt);
+%Enviar dados que representam a matriz de trimagem 'trim'
+write(t_obj, trimVet);
+%Enviar dados que representam a matriz K1
+write(t_obj, nIteracoes);
+
+%% Armazenar dados para analise
+%preallocando memoria para variaveis para melhorar eficiencia do codigo
+xx_ = zeros(nIteracoes, 12); %matriz para armazenar estados passados como um historico
+omega_ = zeros(nIteracoes, 4); %matriz para armazenar velocidades passadas como um historico
+vetor_tempo_loop = zeros(nIteracoes, 1);
+
+%% Armazenar e calcular dados para analise de tempo de processamento
+%Variavel utilizada para obter o tempo gasto por cada iteracao 
+tempo_loop = 0;
+
+%Variavel para medir o tempo que a execucao de todo o loop demorou
+tempo_exec_inicial = tic
+
+%% Inicio da aplicacao de controle a atuacao
+for i = 1:nIteracoes
+    %Marca o tempo inicial da iteracao i para posteriormente ser calculado
+    %o tempo gasto ate o final da mesma iteracao
+    tStart = tic;        
+
+    %receber o estado da aeronave da BBG
+    XX = read(t_obj, 12, DATA_TYPE);
+    %manter historico para plotar posteriormente
+    xx_(i, :) = XX;
+
+    % Receber dado da BBG (variavel de saida de controle)
+    omega = read(t_obj, NUMBER_OF_DATA_2_RCV, DATA_TYPE);
+    omega_(i, :) = omega;
+    
+    %Registra o tempo que pode ser condiferado como o final da iteracao
+    tempo_loop = toc(tStart);
+    
+    %Variavel utilizada para guardar um historico do tempo gasto por cada
+    %iteracao
+    vetor_tempo_loop(i, :) = tempo_loop;
+    
+    %Forcar que o loop ocorra a cada 0.02 segundos, mesmo em casos que o
+    %tempo de calculo e comunicacao com a BBG seja inferior a 0.02.
+    pause(dt - tempo_loop);
+    
+end
+
+%% Fim de execucao. Analise dos resultados obtidos
+
+%Tempo gasto para executar todas as iteracoes
+tempo_exec = toc(tempo_exec_inicial);
+
+% limpando recursos utilizados na comunicao
+clear t_obj %liberando recursos relacionado ao objeto TCP/Ip
+
+%%somente para debug
+plot(xx_(:,11))
+
+##### SOURCE END #####
+--></body></html>

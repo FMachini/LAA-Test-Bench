@@ -1,0 +1,11 @@
+17:31 09/12/2018
+01:24 12/12/2018
+* verificar com o machini a notação dos motores. Motor 1 qual sinal, motor 2 qual sinal
+e assim por diante...
+
+* verificar com machini a ordem dos valores da trimagem no matlab
+
+* conferir qual o polling que coloquei no encoder no computador que fica no lab LAA
+
+* //conferir a ordem do vetor de estado com machini e no pc do lab LAA
+

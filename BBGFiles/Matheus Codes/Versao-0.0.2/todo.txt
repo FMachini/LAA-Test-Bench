@@ -1,0 +1,1 @@
+00:42 26/11/2018 -> adicionar correcao do encoder de orientação; add imu; remover envio de dados desnecessaria do matllab para bbg do hardware in the loop;

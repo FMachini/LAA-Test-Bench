@@ -1,0 +1,12 @@
+17:31 09/12/2018
+01:24 12/12/2018
+* verificar com o machini a notação dos motores. Motor 1 qual sinal, motor 2 qual sinal
+e assim por diante...
+
+* verificar com machini a ordem dos valores da trimagem no matlab
+
+17:00 12/12/2018
+
+* adicionar glad -std=gnu+11
+
+* o motor 3 nao quer funcionarnao sei pq

@@ -1,0 +1,7 @@
+g++ -c main.cpp -std=gnu++11
+main.cpp:6:19: fatal error: motor.h: No such file or directory
+ #include "motor.h"
+                   ^
+compilation terminated.
+Makefile:7: recipe for target 'main.o' failed
+make: *** [main.o] Error 1

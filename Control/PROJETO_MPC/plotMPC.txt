@@ -1,0 +1,27 @@
+# Gnuplot script file for plotting data in file "data.txt"
+# This file is called plot_sim
+set grid
+set autoscale
+
+set multiplot layout 3,2
+set ylabel 'y(k)'
+plot "data.txt" using 1:2 title"{t4[graus]-R}" with lines,"data.txt" using 1:3 title"{4[graus]-M}" with lines lt 1
+
+set ylabel "w(k) - PWM"
+plot "data.txt" using 1:4 title"PWM-1" with lines,"data.txt" using 1:5 title"PWM-2" with lines lt 4
+
+set ylabel "x(k)"
+plot "data.txt" using 1:6 title"x1" with lines,"data.txt" using 1:9 title"x4" with lines lt 2
+
+set ylabel "x(k)"
+plot "data.txt" using 1:7 title"x2" with lines,"data.txt" using 1:8 title"x3" with lines,"data.txt" using 1:10 title"x5" with lines,"data.txt" using 1:11 title"x6" with lines lt 5
+
+set ylabel "u(k) - Forca"
+plot "data.txt" using 1:12 title"F1" with lines,"data.txt" using 1:13 title"F2" with lines, "data.txt" using 1:7 title"x2" with lines,"data.txt" using 1:8 title"x3" with lines lt 3
+
+set ylabel "du(k)"
+plot "data.txt" using 1:14 title"du-1" with lines, "data.txt" using 1:15 title"du-2" with lines lt 6
+
+unset multiplot
+
+

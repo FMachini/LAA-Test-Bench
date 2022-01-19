@@ -1,0 +1,72 @@
+%clear all; close all; clc
+
+% Theta 4 parameters
+a1 = 0.0187;
+b1 = 0.0495;
+c1 = 0.6925;
+
+% Theta 2 Parameters
+b2 = 0.3338; %friction term
+c2 = 1.0173*180/pi; % Motor effectiveness
+
+% Theta 1 Parameters
+%a3 = 0.1724;  % term associated with acceleration
+%b3 = 0.4112; % friction term
+b3 = 1.013;
+%c3 = 2.542; % tilt deflection effectiveness
+c3 = 6.313;
+d3 = 7.756; % Theta 4 Theta 1 coupling term
+
+
+L1 = 0.225;
+L2  =0.225;
+
+A11c =  [0 1; -c1/a1 -b1/a1]; 
+B11c = [0 0; L1/a1 -L2/a1];
+
+A12c = zeros(2,4);
+B12c =  zeros(2,2);
+
+A21c = zeros(4,2); A21c(2,1) = -d3;
+B21c = zeros(4,2); B21c(4,1) = c2; B21c(4,2) = c2;
+
+A22c = zeros(4,4); 
+A22c(1,2) = 1; A22c(3,4) = 1;
+A22c(4,4) = -b2; A22c(2,2) = -b3;
+
+B22c = zeros(4,2); B22c(2,1) = c3; B22c(2,2) = -c3;
+
+Ac = [A11c A12c;
+      A21c A22c];
+  
+Bc = [B11c B12c;
+      B21c B22c];
+  
+
+Act2 = [0 1;-28.228 -8.033];
+Bct2 = [0;28.228];
+Cct2 = eye(2,2);
+Dct2 = [0;0];
+
+Act1 = [0 1;-28.228 -8.033];
+Bct1 = [0;28.228];
+Cct1 = eye(2,2);
+Dct1 = [0;0];
+
+Aex = [Ac zeros(6,4);zeros(4,6) blkdiag(Act1,Act2)];
+Aex(4,7) = 6.313;
+Aex(4,9) = -6.313;
+
+Bex = [Bc(:,1:2) zeros(6,2); zeros(4,4)];
+
+Bex(8,3) = 28.228;Bex(10,4) = 28.228;
+
+Cex = zeros(3,10);
+Cex(1,1) = 1;Cex(2,3)=1;Cex(3,5)=1;%Cex(3,5)=1;Cex(4,6)=1;
+
+ [Aexd, Bexd] = c2dm(Aex, Bex, Cex, zeros(3,4), 0.02, 'zoh');
+
+Q = diag(1*ones(1,10));R = diag(1*ones(1,3));
+
+L = dlqr(Aexd',Cex',Q,R);
+L = L';

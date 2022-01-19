@@ -1,0 +1,35 @@
+# Gnuplot script file for plotting data in file "data.txt"
+# This file is called plot_sim
+set grid
+set autoscale
+filename = "dataF4.txt"
+
+set term x11 0
+set multiplot layout 3,2
+set ylabel 'theta1'
+plot filename using 1 title"{t1[graus]}" with lines lt 1
+plot filename using 4 title"{t1ponto[rad/s]}" with lines lt 2
+
+set ylabel 'theta2'
+plot filename using 2 title"{t2[graus]}" with lines lt 3
+plot filename using 5 title"{t2ponto[rad/s]}" with lines lt 4
+
+set ylabel 'theta4'
+plot filename using 3 title"{t4[graus]}" with lines lt 5
+plot filename using 6 title"{t4ponto[rad/s]}" with lines lt 6
+
+unset multiplot
+
+set term x11 1
+set multiplot layout 2,2
+set ylabel 'force'
+plot filename using 7 title"{u1}" with lines lt 1
+plot filename using 8 title"{u2}" with lines lt 2
+
+set ylabel 'angle'
+plot filename using 9 title"{u3}" with lines lt 3
+plot filename using 10 title"{u4}" with lines lt 4
+unset multiplot
+
+set term x11 2
+plot filename using 11 title"{time[microsegundos]}" with lines

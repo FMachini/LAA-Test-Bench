@@ -1,0 +1,167 @@
+%%%%%%%%%%%%%%%%  Bench Altitude Control %%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Author: Felipe Machini %%%%%%%%%%%%%%%%%%
+%%%% Bench Altitute, lateral and attitude control using LQR technique %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+clear all;close all; clc;
+
+% Test Bench Properties
+a = 0.0187;
+b = 0.0495;
+c = 0.6925;
+Iyy2 = 0.289;
+m1 = 2.761;
+m2 = 0.154;
+m3 = 0.115;
+m4 = 0.600; % bicopter mass
+l3 = 0.173;
+l2 = 0.595;
+L1 = 0.215;
+L2 = 0.225;
+Iz1 = 0.2876;Iz2 = 0.001; Iz3 = 0; Iz4 = 0.0135;
+g = 9.81;
+
+den1 = l2^2*(m1+m3+m4)+Iz1+Iz2+Iz3+Iz4;
+den2 = Iyy2 + 1/4 * l3^2* m2 + l2^2*(m2+m3+m4);
+% Linear State Space Model
+% x = [Theta1 Theta2 Theta4 Theta1_dot Theta2_dot Theta4_dot]
+% expanded state vector (including error) z = [(x1ref-x1) (x2ref-x2) x_dot]
+a1 = -l2*g*(m1+m2+m4)/den1;
+Ac= [0 0 0 1 0 0;
+     0 0 0 0 1 0;
+     0 0 0 0 0 1;
+     0 0 a1 0 0 0;
+     0 0 0 0 0 0;
+     0 0 -c/a 0 0 -b/a];
+
+b1 = l2/den1;
+b2 = l2/den2;
+
+Bc= [0 0 0;
+    0 0 0;
+    0 0 0;
+    0 b1 0;
+    -b2 0 0;
+    0 0 1/a];
+
+Cc = [1 0 0 0 0 0
+      0 1 0 0 0 0
+      0 0 1 0 0 0]; 
+  
+Aa = [zeros(3,3) Cc;
+      zeros(6,3) Ac];
+
+Bb = [zeros(3,3);Bc];
+%  B= [0;
+%      (L1+L2)/a]; % considerando apenas uma entrada: forca f aplicada + no motor 1 e - no motor 2
+D = 0;
+sysC = ss(Aa,Bb,eye(size(Aa)),D);
+
+% Discrete time state space model
+T = 0.02;%(s)
+sysD = c2d(sysC,T);
+A = sysD.A;
+B = sysD.B;
+C = sysD.C;
+D = sysD.D;
+
+% Designing LQR tracking Controler
+qe = [10 10 50];
+qa = [10 10 1];
+qv = [10 5 3];
+Qr = diag([qe qa qv]);
+Rr = diag([5 0.1 0.5]) ;
+
+Kc = dlqr(A,B,Qr,Rr);
+Kp = Kc(:,1:3)
+Kx = Kc(:, 4:end)
+
+% Simulation
+Ad = A(4:end,4:end);
+Bd = B(4:end,:);
+xref = [10; 0; 0]*pi/180; %reference position (rad)
+dt = 0.02; %sampling time
+numit = 2000;
+x = zeros(6,numit);
+x(:,1) = [0 0 0 0 0 0]*pi/180;
+u = zeros(3,numit);
+alpha = zeros(1,numit);
+f1 = zeros(1,numit);f2 = zeros(1,numit);
+duty = u;
+int_e=[0;0;0];
+trimForce = 0.0917*37 - 1.39;
+for i = 1:numit
+    
+    e = xref - Cc*x(:,i);
+    int_e = int_e + e*dt;
+    u(:,i) = Kp*int_e - Kx*x(:,i);
+    
+    x(:,i+1) = Ad*x(:,i) + Bd*u(:,i);
+    
+    Fz = u(1,i)+m4*g*cos(x(3,i))
+    Fy = u(2,i)+m4*g*sin(x(3,i));
+    
+    if u(2,i)>0.0001
+        f2(1,i) = (L1*Fz - u(3,i))/(L1+L2);
+        alpha(1,i) = atan2( Fy , (Fz - f2(1,i)));
+        f1(1,i) = Fy / sin(alpha(1,i)); 
+        %f1(1,i)+f2(1,i)
+    elseif  u(2,i)<-0.0001
+            f1(1,i) = (L2*Fz + u(3,i))/(L1+L2);
+            alpha(1,i) = atan2( Fy, ( Fz - f1(1,i) ));
+            f2(1,i) = Fy / sin(alpha(1,i));
+
+    elseif u(2,i) > -0.0001 || u(2,i) < 0.001
+            f1(1,i) = ( Fz + u(3,i)/L2 ) / (1+L1/L2);
+            f2(1,i) = Fz - f1(1,i);
+            alpha(1,i) = 0;
+    end
+    
+    
+    if alpha(1,i) > 25*pi/180
+            alpha(1,i) = 25*pi/180;
+    end
+   % duty(:,i) = 1000000 + (u(:,i) + 1.39 + trimForce)*10000/0.0917;
+end
+
+figure
+subplot(3,2,1)
+plot(x(1,:))
+ylabel('\theta_1(k)');
+subplot(3,2,3)
+plot(x(2,:))
+ylabel('\theta_2(k)');
+subplot(3,2,5)
+plot(x(3,:))
+ylabel('\theta_4(k)');
+subplot(3,2,2)
+plot(x(4,:))
+ylabel('dot{\theta_1(k)}');
+subplot(3,2,4)
+plot(x(5,:))
+ylabel('dot{\theta_2(k)}');
+subplot(3,2,6)
+plot(x(6,:))
+ylabel('dot{\theta_4(k)}');
+
+figure;
+subplot(3,1,1)
+plot(f1(1,:));
+ylabel('F_1')
+subplot(3,1,2)
+plot(f2(1,:))
+ylabel('F_2')
+subplot(3,1,3)
+plot(alpha(1,:)*180/pi)
+ylabel('\alpha')
+
+figure;
+subplot(3,1,1)
+plot(u(1,:));
+ylabel('Fz')
+subplot(3,1,2)
+plot(u(2,:))
+ylabel('Fy')
+subplot(3,1,3)
+plot(u(3,:))
+ylabel('\tau')
